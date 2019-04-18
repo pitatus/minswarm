@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 '''
 Salt Minion Swarm
 '''
@@ -47,7 +47,8 @@ def prgopts():
     parser.add_option(
         '-m',
         dest='master',
-        help='The location of the salt master to connect to. (REQUIRED)')
+        default='127.0.0.1',
+        help='The location of the salt master to connect to. (Default: %default)')
     parser.add_option(
         '-i',
         dest='id',
@@ -85,7 +86,7 @@ def mkConfigDir( __grains__, m_id, m_master, num, s_vers ):
     '''
     Create config dir with empty cache and pki dirs
     '''
-    os_str = string.replace( __grains__['os'], ' ', '_' )
+    os_str = str(__grains__['os']).replace(' ', '_' )
     minion_str = "%s-%s-%s-%s" %( os_str, '{:02d}'.format( m_id ), random.choice(TYP), idgen() )
     baseDir = os.path.join( "/tmp/minswarm", minion_str )
     cacheDir = os.path.join( baseDir, "cache" )
@@ -157,7 +158,6 @@ def mkConfigDir( __grains__, m_id, m_master, num, s_vers ):
 
 ## =========================================================
 if __name__ == '__main__':
-
     opts = prgopts()
 
     __opts__ = salt.config.minion_config( opts['cf'] )
@@ -175,7 +175,9 @@ if __name__ == '__main__':
             saltvers.append( e )
 
     print( "Starting minions. . ." )
-    for n in range( 1, count+1 ):
+
+
+    for n in range(1, count+1):
         if n%20 == 0:
             network_num += 1
         mkConfigDir( __grains__, minion_id, minion_master, network_num, saltvers )
